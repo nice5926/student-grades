@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生成绩查询系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .input-group {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+        }
+        
+        #nameInput {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #2575fc;
+            border-radius: 8px 0 0 8px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        #nameInput:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+        }
+        
+        #searchBtn {
+            background: #2575fc;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        #searchBtn:hover {
+            background: #1a65e0;
+        }
+        
+        .result-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+        }
+        
+        .student-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .student-name {
+            font-size: 2.2rem;
+            color: #2575fc;
+            margin-bottom: 10px;
+        }
+        
+        .student-rank {
+            font-size: 1.3rem;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: 700;
+        }
+        
+        .scores-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .subject-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .subject-name {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .subject-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2575fc;
+        }
+        
+        .subject-max {
+            font-size: 0.9rem;
+            color: #868e96;
+        }
+        
+        .recommendation {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .recommendation h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .recommendation-content {
+            line-height: 1.8;
+            color: #37474f;
+        }
+        
+        .recommendation-content ul {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+        
+        .recommendation-content li {
+            margin-bottom: 8px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2575fc;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-top: 30px;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .scores-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #nameInput {
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+            
+            #searchBtn {
+                border-radius: 8px;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>学生成绩查询系统</h1>
+            <p class="subtitle">输入学生姓名查询考试成绩及学习建议</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="请输入学生姓名">
+                <button id="searchBtn">查询成绩</button>
+            </div>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="student-info">
+                <h2 class="student-name" id="studentName">陆思彤</h2>
+                <div class="student-rank">年级排名：<span id="studentRank">1</span></div>
+            </div>
+            
+            <div class="scores-container" id="scoresContainer">
+                <!-- 科目成绩卡片将通过JS动态生成 -->
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">总分</div>
+                    <div class="stat-value" id="totalScore">557.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">年级最高分</div>
+                    <div class="stat-value">557.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">年级平均分</div>
+                    <div class="stat-value">426.5</div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <h3>学习建议</h3>
+                <div class="recommendation-content" id="recommendationContent">
+                    <!-- 学习建议将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 学生成绩查询系统 | 总分 = 语文(120) + 数学(120) + 英语(120) + 道法(75) + 历史(75) + 生物(60) + 地理(60)</p>
+        </div>
+    </div>
+
+    <script>
+        // 学生成绩数据
+        const studentData = [
+            {姓名:"陆思彤",语文:100.0,数学:101.0,英语:112.0,道法:65.0,历史:69,生物:57,地理:53,总分:557.0,排名:1},
+            {姓名:"蒙以宗",语文:97.5,数学:109.5,英语:108.0,道法:65.5,历史:59,生物:53,地理:54,总分:546.5,排名:2},
+            {姓名:"韦新娜",语文:98.5,数学:108.5,英语:102.0,道法:63.0,历史:67,生物:52,地理:53,总分:544.0,排名:3},
+            {姓名:"陈昌平",语文:85.0,数学:105.5,英语:112.0,道法:58.5,历史:61,生物:55,地理:56,总分:533.0,排名:4},
+            {姓名:"韦曼玉",语文:92.0,数学:103.5,英语:106.5,道法:61.5,历史:61,生物:57,地理:51,总分:532.5,排名:5},
+            {姓名:"黄敏柔",语文:97.5,数学:93.5,英语:106.0,道法:58.0,历史:58,生物:55,地理:48,总分:516.0,排名:6},
+            {姓名:"陈璇",语文:91.5,数学:103.5,英语:103.5,道法:59.5,历史:53,生物:50,地理:53,总分:514.0,排名:7},
+            {姓名:"蒙秀凤",语文:89.5,数学:101.5,英语:103.0,道法:56.5,历史:58,生物:56,地理:49,总分:513.5,排名:8},
+            {姓名:"黄佳易",语文:96.5,数学:105.0,英语:93.0,道法:56.0,历史:53,生物:46,地理:54,总分:503.5,排名:9},
+            {姓名:"甘子豪",语文:88.5,数学:100.5,英语:98.5,道法:52.5,历史:60,生物:49,地理:52,总分:501.0,排名:10},
+            {姓名:"磨子俊",语文:94.0,数学:101.5,英语:94.0,道法:50.5,历史:58,生物:54,地理:44,总分:496.0,排名:11},
+            {姓名:"王鹏",语文:93.0,数学:106.0,英语:98.5,道法:56.5,历史:58,生物:38,地理:45,总分:495.0,排名:12},
+            {姓名:"覃一祖",语文:80.5,数学:97.0,英语:106.5,道法:58.0,历史:55,生物:53,地理:40,总分:490.0,排名:13},
+            {姓名:"黎若煊",语文:93.5,数学:92.0,英语:109.0,道法:49.5,历史:53,生物:55,地理:36,总分:488.0,排名:14},
+            {姓名:"黄羽钰",语文:89.5,数学:88.0,英语:96.5,道法:58.5,历史:59,生物:49,地理:44,总分:484.5,排名:15},
+            {姓名:"黄秋晴",语文:93.0,数学:93.0,英语:79.5,道法:55.0,历史:57,生物:60,地理:44,总分:481.5,排名:16},
+            {姓名:"黄玉莹",语文:96.0,数学:96.0,英语:96.5,道法:54.5,历史:50,生物:46,地理:37,总分:476.0,排名:17},
+            {姓名:"施明浩",语文:85.0,数学:106.0,英语:97.5,道法:51.0,历史:49,生物:37,地理:47,总分:472.5,排名:18},
+            {姓名:"黄宝欣",语文:90.0,数学:97.0,英语:95.5,道法:57.5,历史:43,生物:49,地理:37,总分:469.0,排名:19},
+            {姓名:"林政羲",语文:89.0,数学:93.0,英语:89.5,道法:46.5,历史:49,生物:51,地理:50,总分:468.0,排名:20},
+            {姓名:"谢建国",语文:88.5,数学:80.5,英语:92.5,道法:47.0,历史:60,生物:54,地理:41,总分:463.5,排名:21},
+            {姓名:"黄硕怀",语文:79.0,数学:96.0,英语:88.5,道法:45.5,历史:52,生物:54,地理:40,总分:455.0,排名:22},
+            {姓名:"张可昕",语文:95.0,数学:95.5,英语:81.5,道法:57.5,历史:40,生物:45,地理:36,总分:450.5,排名:23},
+            {姓名:"潘志杰",语文:88.0,数学:86.0,英语:84.5,道法:47.0,历史:50,生物:52,地理:38,总分:445.5,排名:24},
+            {姓名:"陆耀焜",语文:72.0,数学:90.0,英语:81.5,道法:51.5,历史:48,生物:53,地理:46,总分:442.0,排名:25},
+            {姓名:"蓝天宇",语文:89.5,数学:67.5,英语:99.5,道法:47.0,历史:49,生物:52,地理:37,总分:441.5,排名:26},
+            {姓名:"徐炜琳",语文:89.0,数学:74.0,英语:89.5,道法:48.0,历史:52,生物:49,地理:40,总分:441.5,排名:27},
+            {姓名:"谢妮君",语文:98.0,数学:88.5,英语:81.0,道法:48.0,历史:52,生物:45,地理:23,总分:435.5,排名:28},
+            {姓名:"郑民通",语文:79.5,数学:100.0,英语:65.5,道法:50.5,历史:52,生物:55,地理:32,总分:434.5,排名:29},
+            {姓名:"蒋星月",语文:88.0,数学:89.0,英语:89.0,道法:40.5,历史:38,生物:52,地理:33,总分:429.5,排名:30},
+            {姓名:"蒋宇",语文:72.5,数学:89.0,英语:99.5,道法:46.5,历史:47,生物:35,地理:35,总分:424.5,排名:31},
+            {姓名:"屈夕滟",语文:90.0,数学:72.0,英语:104.0,道法:53.5,历史:36,生物:38,地理:31,总分:424.5,排名:32},
+            {姓名:"韦勇勤",语文:79.0,数学:90.5,英语:77.5,道法:51.5,历史:41,生物:42,地理:39,总分:420.5,排名:33},
+            {姓名:"林悦阳",语文:84.0,数学:91.0,英语:83.5,道法:52.0,历史:38,生物:46,地理:25,总分:419.5,排名:34},
+            {姓名:"刘诗琪",语文:83.0,数学:87.0,英语:89.5,道法:53.0,历史:41,生物:45,地理:20,总分:418.5,排名:35},
+            {姓名:"肖景焕",语文:83.5,数学:75.0,英语:89.0,道法:49.5,历史:40,生物:40,地理:37,总分:414.0,排名:36},
+            {姓名:"唐彤",语文:83.5,数学:77.5,英语:94.5,道法:45.0,历史:39,生物:48,地理:26,总分:413.5,排名:37},
+            {姓名:"赵文杰",语文:79.0,数学:92.5,英语:74.0,道法:43.0,历史:46,生物:47,地理:31,总分:412.5,排名:38},
+            {姓名:"程昭朗",语文:76.0,数学:72.0,英语:73.5,道法:48.5,历史:52,生物:42,地理:48,总分:412.0,排名:39},
+            {姓名:"李博航",语文:72.5,数学:100.0,英语:67.0,道法:46.5,历史:45,生物:45,地理:34,总分:410.0,排名:40},
+            {姓名:"陆子涵",语文:83.5,数学:93.5,英语:87.5,道法:45.0,历史:36,生物:38,地理:22,总分:405.5,排名:41},
+            {姓名:"黄睿孜",语文:87.5,数学:69.5,英语:79.0,道法:45.0,历史:45,生物:47,地理:29,总分:402.0,排名:42},
+            {姓名:"虞雅茜",语文:84.5,数学:73.0,英语:77.5,道法:40.0,历史:46,生物:39,地理:39,总分:399.0,排名:43},
+            {姓名:"卓星辰",语文:79.5,数学:80.0,英语:77.5,道法:40.0,历史:36,生物:48,地理:34,总分:395.0,排名:44},
+            {姓名:"赵诗琪",语文:85.0,数学:87.5,英语:87.0,道法:34.0,历史:37,生物:35,地理:27,总分:392.5,排名:45},
+            {姓名:"刘云涛",语文:81.0,数学:97.5,英语:68.0,道法:43.0,历史:22,生物:39,地理:37,总分:387.5,排名:46},
+            {姓名:"陆宣名",语文:89.5,数学:70.5,英语:70.0,道法:48.0,历史:42,生物:41,地理:26,总分:387.0,排名:47},
+            {姓名:"甘子恒",语文:77.0,数学:67.0,英语:71.5,道法:39.5,历史:44,生物:43,地理:38,总分:380.0,排名:48},
+            {姓名:"施婉婷",语文:78.0,数学:61.0,英语:68.0,道法:53.5,历史:45,生物:42,地理:31,总分:378.5,排名:49},
+            {姓名:"王燕萍",语文:82.5,数学:80.0,英语:71.5,道法:41.0,历史:36,生物:35,地理:18,总分:364.0,排名:50},
+            {姓名:"甘友贤",语文:74.5,数学:55.5,英语:78.5,道法:43.0,历史:41,生物:42,地理:24,总分:358.5,排名:51},
+            {姓名:"黄钰文",语文:71.5,数学:73.5,英语:67.5,道法:44.5,历史:39,生物:23,地理:21,总分:340.0,排名:52},
+            {姓名:"何雨航",语文:68.0,数学:66.0,英语:58.5,道法:38.5,历史:35,生物:33,地理:26,总分:325.0,排名:53},
+            {姓名:"孔欣",语文:69.5,数学:62.0,英语:67.0,道法:42.5,历史:37,生物:29,地理:18,总分:325.0,排名:54},
+            {姓名:"黄诗琪",语文:75.5,数学:59.5,英语:63.5,道法:48.5,历史:22,生物:33,地理:22,总分:324.0,排名:55},
+            {姓名:"屈宛晴",语文:69.0,数学:40.5,英语:72.0,道法:38.5,历史:41,生物:33,地理:29,总分:323.0,排名:56},
+            {姓名:"叶鑫兰",语文:66.5,数学:62.0,英语:62.0,道法:40.5,历史:26,生物:44,地理:20,总分:321.0,排名:57},
+            {姓名:"覃俊鸿",语文:55.0,数学:67.0,英语:47.5,道法:40.0,历史:36,生物:48,地理:27,总分:320.5,排名:58},
+            {姓名:"黎晨希",语文:72.0,数学:60.5,英语:59.0,道法:42.5,历史:29,生物:37,地理:19,总分:319.0,排名:59},
+            {姓名:"莫梓濛",语文:57.0,数学:54.5,英语:70.5,道法:39.5,历史:33,生物:31,地理:28,总分:313.5,排名:60},
+            {姓名:"黄培杰",语文:54.0,数学:41.0,英语:63.0,道法:38.5,历史:31,生物:40,地理:28,总分:295.5,排名:61},
+            {姓名:"黄鑫源",语文:63.0,数学:46.0,英语:60.5,道法:46.5,历史:28,生物:29,地理:20,总分:293.0,排名:62},
+            {姓名:"韦诗琪",语文:65.0,数学:34.0,英语:68.5,道法:37.5,历史:28,生物:29,地理:20,总分:282.0,排名:63},
+            {姓名:"韦成超",语文:57.5,数学:65.5,英语:33.0,道法:41.0,历史:24,生物:45,地理:14,总分:280.0,排名:64},
+            {姓名:"谭云翔",语文:50.5,数学:33.0,英语:73.0,道法:36.5,历史:28,生物:28,地理:18,总分:267.0,排名:65},
+            {姓名:"唐康",语文:57.0,数学:28.0,英语:41.0,道法:36.5,历史:28,生物:35,地理:33,总分:258.5,排名:66},
+            {姓名:"李想115",语文:12.5,数学:26.0,英语:68.0,道法:27.0,历史:14,生物:16,地理:12,总分:175.5,排名:67}
+        ];
+
+        // 各科满分
+        const maxScores = {
+            语文: 120,
+            数学: 120,
+            英语: 120,
+            道法: 75,
+            历史: 75,
+            生物: 60,
+            地理: 60
+        };
+
+        // 计算年级平均分
+        const totalScores = studentData.map(student => student.总分);
+        const averageScore = (totalScores.reduce((sum, score) => sum + score, 0) / studentData.length).toFixed(1);
+
+        // DOM元素
+        const nameInput = document.getElementById('nameInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const studentName = document.getElementById('studentName');
+        const studentRank = document.getElementById('studentRank');
+        const scoresContainer = document.getElementById('scoresContainer');
+        const totalScoreElement = document.getElementById('totalScore');
+        const recommendationContent = document.getElementById('recommendationContent');
+
+        // 最高分
+        const highestScore = studentData[0].总分;
+
+        // 查询函数
+        function searchStudent() {
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('请输入学生姓名');
+                return;
+            }
+            
+            // 查找学生（不区分大小写）
+            const student = studentData.find(s => s.姓名.toLowerCase() === name.toLowerCase());
+            
+            if (student) {
+                // 显示学生姓名和排名
+                studentName.textContent = student.姓名;
+                studentRank.textContent = student.排名;
+                
+                // 显示总分
+                totalScoreElement.textContent = student.总分;
+                
+                // 清空成绩容器
+                scoresContainer.innerHTML = '';
+                
+                // 添加各科成绩卡片
+                Object.keys(maxScores).forEach(subject => {
+                    const score = student[subject];
+                    const maxScore = maxScores[subject];
+                    const percentage = (score / maxScore * 100).toFixed(1);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'subject-card';
+                    
+                    card.innerHTML = `
+                        <div class="subject-name">${subject}</div>
+                        <div class="subject-score">${score}</div>
+                        <div class="subject-max">满分: ${maxScore}</div>
+                        <div class="subject-percentage">得分率: ${percentage}%</div>
+                    `;
+                    
+                    scoresContainer.appendChild(card);
+                });
+                
+                // 生成学习建议
+                generateRecommendations(student);
+                
+                // 显示结果容器
+                resultContainer.style.display = 'block';
+                
+                // 滚动到结果区域
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('未找到该学生的成绩信息，请检查姓名是否正确');
+            }
+        }
+
+        // 生成学习建议
+        function generateRecommendations(student) {
+            let recommendations = [];
+            
+            // 总体评价
+            const rankPercentage = (student.排名 / studentData.length * 100).toFixed(1);
+            let overallComment = '';
+            
+            if (student.排名 <= 5) {
+                overallComment = `恭喜你取得了年级第${student.排名}名的优异成绩！继续保持这种学习状态，你在学业上将会有更大的突破！`;
+            } else if (student.排名 <= 20) {
+                overallComment = `你的年级排名是${student.排名}（前${rankPercentage}%），表现良好！通过分析各科成绩，找出可以提升的科目，你还有很大的进步空间。`;
+            } else if (student.排名 <= 40) {
+                overallComment = `你的年级排名是${student.排名}（前${rankPercentage}%），处于年级中游水平。建议找出自己的薄弱科目，制定学习计划，争取更大进步。`;
+            } else {
+                overallComment = `你的年级排名是${student.排名}，有很大的提升空间。不要气馁，分析各科成绩，找出问题所在，制定合理的学习计划，坚持努力一定会有进步！`;
+            }
+            
+            recommendations.push(overallComment);
+            
+            // 各科建议
+            const subjects = ['语文', '数学', '英语', '道法', '历史', '生物', '地理'];
+            
+            subjects.forEach(subject => {
+                const score = student[subject];
+                const maxScore = maxScores[subject];
+                const percentage = score / maxScore;
+                
+                let subjectComment = '';
+                
+                if (percentage >= 0.9) {
+                    subjectComment = `${subject}非常优秀（得分率${(percentage*100).toFixed(1)}%），继续保持优势！`;
+                } else if (percentage >= 0.8) {
+                    subjectComment = `${subject}良好（得分率${(percentage*100).toFixed(1)}%），注意查漏补缺，争取更优异表现。`;
+                } else if (percentage >= 0.6) {
+                    subjectComment = `${subject}合格（得分率${(percentage*100).toFixed(1)}%），需要加强基础知识学习和解题技巧训练。`;
+                } else {
+                    subjectComment = `${subject}需要重点加强（得分率${(percentage*100).toFixed(1)}%），建议多投入时间，夯实基础，寻求老师帮助。`;
+                }
+                
+                recommendations.push(subjectComment);
+            });
+            
+            // 总分建议
+            if (student.总分 < 400) {
+                recommendations.push("你的总分还有很大提升空间，建议从最薄弱的科目开始，制定详细的学习计划，逐步提高各科成绩。");
+            } else if (student.总分 < 500) {
+                recommendations.push("你的总分处于中等水平，找出1-2个提升潜力大的科目重点突破，总分会有明显提高。");
+            }
+            
+            // 显示建议
+            recommendationContent.innerHTML = `
+                <p>${recommendations[0]}</p>
+                <p>各科学习建议：</p>
+                <ul>
+                    ${recommendations.slice(1).map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+                <p>建议制定每日学习计划，平衡各科学习时间，定期复习巩固，积极参与课堂互动，及时解决学习疑问。</p>
+            `;
+        }
+
+        // 初始显示平均分
+        document.querySelectorAll('.stat-value')[2].textContent = averageScore;
+        
+        // 绑定事件
+        searchBtn.addEventListener('click', searchStudent);
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchStudent();
+            }
+        });
+        
+        // 页面加载时显示一个示例
+        window.addEventListener('load', () => {
+            nameInput.value = '陆思彤';
+            setTimeout(searchStudent, 500);
+        });
+    </script>
+</body>
+</html>
